@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Service } from '../../services/entities/service.entity';
 
@@ -11,7 +20,10 @@ export enum BookingStatus {
 
 @Entity()
 export class Booking {
-  @ApiProperty({ description: 'Unique identifier of the booking', example: 'e3b07384-d113-49c5-a559-6d6f46e0401b' })
+  @ApiProperty({
+    description: 'Unique identifier of the booking',
+    example: 'e3b07384-d113-49c5-a559-6d6f46e0401b',
+  })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -19,19 +31,31 @@ export class Booking {
   @Column()
   customerName: string;
 
-  @ApiProperty({ description: 'Email address of the customer', example: 'jane.doe@example.com' })
+  @ApiProperty({
+    description: 'Email address of the customer',
+    example: 'jane.doe@example.com',
+  })
   @Column()
   customerEmail: string;
 
-  @ApiProperty({ description: 'Phone number of the customer', example: '555-0199' })
+  @ApiProperty({
+    description: 'Phone number of the customer',
+    example: '555-0199',
+  })
   @Column()
   customerPhone: string;
 
-  @ApiProperty({ description: 'ID of the booked service', example: 'd3b07384-d113-49c5-a559-6d6f46e0401d' })
+  @ApiProperty({
+    description: 'ID of the booked service',
+    example: 'd3b07384-d113-49c5-a559-6d6f46e0401d',
+  })
   @Column()
   serviceId: string;
 
-  @ApiProperty({ description: 'Date of the booking (YYYY-MM-DD)', example: '2026-08-10' })
+  @ApiProperty({
+    description: 'Date of the booking (YYYY-MM-DD)',
+    example: '2026-08-10',
+  })
   @Column()
   bookingDate: string;
 
@@ -39,7 +63,11 @@ export class Booking {
   @Column()
   bookingTime: string;
 
-  @ApiProperty({ description: 'Status of the booking', enum: BookingStatus, default: BookingStatus.PENDING })
+  @ApiProperty({
+    description: 'Status of the booking',
+    enum: BookingStatus,
+    default: BookingStatus.PENDING,
+  })
   @Column({
     type: 'simple-enum', // Use simple-enum for SQLite compatibility
     enum: BookingStatus,
@@ -47,7 +75,11 @@ export class Booking {
   })
   status: BookingStatus;
 
-  @ApiProperty({ description: 'Optional customer notes', example: 'Please prepare the table beforehand.', required: false })
+  @ApiProperty({
+    description: 'Optional customer notes',
+    example: 'Please prepare the table beforehand.',
+    required: false,
+  })
   @Column('text', { nullable: true })
   notes?: string;
 
@@ -67,11 +99,17 @@ export class Booking {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ApiProperty({ description: 'User identifier who created this booking (null for public)', required: false })
+  @ApiProperty({
+    description: 'User identifier who created this booking (null for public)',
+    required: false,
+  })
   @Column({ nullable: true })
   createdBy?: string;
 
-  @ApiProperty({ description: 'User identifier who last updated this booking status', required: false })
+  @ApiProperty({
+    description: 'User identifier who last updated this booking status',
+    required: false,
+  })
   @Column({ nullable: true })
   updatedBy?: string;
 }

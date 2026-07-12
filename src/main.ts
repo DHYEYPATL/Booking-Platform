@@ -23,10 +23,14 @@ async function bootstrap() {
           defaultSrc: [`'self'`],
           styleSrc: [`'self'`, `'unsafe-inline'`], // Required for Swagger UI styling
           imgSrc: [`'self'`, 'data:', 'https://validator.swagger.io'],
-          scriptSrc: [`'self'`, `'unsafe-inline'`, `https://cdnjs.cloudflare.com`], // Required for Swagger UI scripts
+          scriptSrc: [
+            `'self'`,
+            `'unsafe-inline'`,
+            `https://cdnjs.cloudflare.com`,
+          ], // Required for Swagger UI scripts
         },
       },
-    })
+    }),
   );
 
   // Enable CORS with explicit configurations
@@ -66,7 +70,7 @@ async function bootstrap() {
           formattedErrors,
         );
       },
-    })
+    }),
   );
 
   // Apply Global Exception Filter
@@ -76,7 +80,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Booking Platform REST API')
     .setDescription(
-      'The API documentation for the Booking Platform. Allows managing services, creating and monitoring customer bookings, and admin user authentication.'
+      'The API documentation for the Booking Platform. Allows managing services, creating and monitoring customer bookings, and admin user authentication.',
     )
     .setVersion('1.0.0')
     .addBearerAuth(
@@ -88,7 +92,7 @@ async function bootstrap() {
         description: 'Enter JWT Access Token to access secured endpoints',
         in: 'header',
       },
-      'bearer' // Security key definition name
+      'bearer', // Security key definition name
     )
     .build();
 
@@ -99,6 +103,8 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}/api/v1`);
-  console.log(`API Swagger documentation is available at: http://localhost:${port}/api/docs`);
+  console.log(
+    `API Swagger documentation is available at: http://localhost:${port}/api/docs`,
+  );
 }
 bootstrap();

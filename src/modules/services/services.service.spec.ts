@@ -64,22 +64,36 @@ describe('ServicesService', () => {
 
   describe('create', () => {
     it('should successfully create and save a service', async () => {
-      const dto = { title: 'Premium Haircut', description: 'Includes wash', duration: 45, price: 50.0 };
-      const savedService = { id: 'service-uuid', ...dto, isActive: true } as Service;
-      
+      const dto = {
+        title: 'Premium Haircut',
+        description: 'Includes wash',
+        duration: 45,
+        price: 50.0,
+      };
+      const savedService = {
+        id: 'service-uuid',
+        ...dto,
+        isActive: true,
+      } as Service;
+
       serviceRepository.create.mockReturnValue(savedService);
       serviceRepository.save.mockResolvedValue(savedService);
 
       const result = await service.create(dto, 'admin-uuid');
       expect(result).toEqual(savedService);
-      expect(serviceRepository.create).toHaveBeenCalledWith(expect.objectContaining({ ...dto, createdBy: 'admin-uuid' }));
+      expect(serviceRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ ...dto, createdBy: 'admin-uuid' }),
+      );
       expect(cacheService.clear).toHaveBeenCalled();
     });
   });
 
   describe('findAll', () => {
     it('should return cached services if available', async () => {
-      const cached = { data: [{ id: '1', title: 'Cached' } as Service], total: 1 };
+      const cached = {
+        data: [{ id: '1', title: 'Cached' } as Service],
+        total: 1,
+      };
       cacheService.get.mockReturnValue(cached);
 
       const result = await service.findAll({ limit: 10, offset: 0 });
@@ -95,7 +109,11 @@ describe('ServicesService', () => {
 
       const result = await service.findAll({ limit: 10, offset: 0 });
       expect(result.data).toEqual(services);
-      expect(cacheService.set).toHaveBeenCalledWith('services:limit=10:offset=0', { data: services, total: 1 }, 300000);
+      expect(cacheService.set).toHaveBeenCalledWith(
+        'services:limit=10:offset=0',
+        { data: services, total: 1 },
+        300000,
+      );
     });
   });
 
@@ -103,7 +121,9 @@ describe('ServicesService', () => {
     it('should throw NotFoundException if service not found', async () => {
       serviceRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne('invalid-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should return service by ID', async () => {
@@ -119,13 +139,21 @@ describe('ServicesService', () => {
     it('should update and save the service', async () => {
       const mockService = { id: 'service-uuid', title: 'A Service' } as Service;
       const updateDto = { title: 'Updated Title' };
-      const mergedService = { ...mockService, ...updateDto, updatedBy: 'admin-uuid' } as Service;
+      const mergedService = {
+        ...mockService,
+        ...updateDto,
+        updatedBy: 'admin-uuid',
+      } as Service;
 
       serviceRepository.findOne.mockResolvedValue(mockService);
       serviceRepository.merge.mockReturnValue(mergedService);
       serviceRepository.save.mockResolvedValue(mergedService);
 
-      const result = await service.update('service-uuid', updateDto, 'admin-uuid');
+      const result = await service.update(
+        'service-uuid',
+        updateDto,
+        'admin-uuid',
+      );
       expect(result.title).toBe('Updated Title');
       expect(serviceRepository.save).toHaveBeenCalledWith(mergedService);
       expect(cacheService.clear).toHaveBeenCalled();
@@ -136,9 +164,13 @@ describe('ServicesService', () => {
     it('should throw BadRequestException if active bookings exist', async () => {
       const mockService = { id: 'service-uuid', title: 'A Service' } as Service;
       serviceRepository.findOne.mockResolvedValue(mockService);
-      bookingRepository.findOne.mockResolvedValue({ id: 'booking-id' } as Booking);
+      bookingRepository.findOne.mockResolvedValue({
+        id: 'booking-id',
+      } as Booking);
 
-      await expect(service.remove('service-uuid')).rejects.toThrow(BadRequestException);
+      await expect(service.remove('service-uuid')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should soft delete the service if no active bookings exist', async () => {

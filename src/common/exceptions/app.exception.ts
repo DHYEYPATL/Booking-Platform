@@ -23,7 +23,7 @@ export class AppException extends HttpException {
         errorCode,
         ...(errors ? { errors } : {}),
       },
-      statusCode
+      statusCode,
     );
   }
 }

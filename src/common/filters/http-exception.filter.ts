@@ -1,4 +1,11 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 
 @Catch()
@@ -18,7 +25,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
-      
+
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         message = (exceptionResponse as any).message || exception.message;
         errorCode = (exceptionResponse as any).errorCode;
@@ -28,7 +35,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }
     } else if (exception instanceof Error) {
       const err = exception as any;
-      
+
       // PostgreSQL unique constraint violation error code
       if (err.code === '23505') {
         status = HttpStatus.CONFLICT;
@@ -36,7 +43,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         errorCode = 'ERR_DUPLICATE_RECORD';
       } else if (err.code === 'SQLITE_CONSTRAINT') {
         status = HttpStatus.CONFLICT;
-        message = 'A database constraint was violated (e.g. duplicate booking or field validation conflict).';
+        message =
+          'A database constraint was violated (e.g. duplicate booking or field validation conflict).';
         errorCode = 'ERR_DATABASE_CONSTRAINT';
       } else {
         message = exception.message;
@@ -47,7 +55,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     this.logger.error(
       `${request.method} ${request.url} - Status: ${status} - ErrorCode: ${errorCode || 'NONE'} - Error: ${
         typeof message === 'object' ? JSON.stringify(message) : message
-      }`
+      }`,
     );
 
     // Send formatted JSON error response

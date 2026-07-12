@@ -33,7 +33,7 @@ describe('Booking Platform Flow (e2e)', () => {
 
   afterAll(async () => {
     await app.close();
-    
+
     // Clean up test database file
     const dbPath = path.join(process.cwd(), 'test-booking-flow.sqlite');
     try {

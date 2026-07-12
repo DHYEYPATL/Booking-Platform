@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -18,13 +22,19 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<Omit<User, 'password' | 'currentRefreshTokenHash'>> {
+  async register(
+    registerDto: RegisterDto,
+  ): Promise<Omit<User, 'password' | 'currentRefreshTokenHash'>> {
     const { email, password } = registerDto;
 
     // Check if user already exists
-    const existingUser = await this.userRepository.findOne({ where: { email } });
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
-      throw new ConflictException('A user with this email address already exists');
+      throw new ConflictException(
+        'A user with this email address already exists',
+      );
     }
 
     // Hash the password
@@ -37,7 +47,7 @@ export class AuthService {
     });
 
     const savedUser = await this.userRepository.save(user);
-    
+
     // Return user without password or refresh token hash
     const { password: _, currentRefreshTokenHash: __, ...result } = savedUser;
     return result;
@@ -47,13 +57,13 @@ export class AuthService {
     const { email, password } = loginDto;
 
     // Find user by email
-    const user = await this.userRepository.findOne({ 
+    const user = await this.userRepository.findOne({
       where: { email },
       select: {
         id: true,
         email: true,
         password: true,
-      } // Explicitly select password which is hidden by default
+      }, // Explicitly select password which is hidden by default
     });
 
     if (!user) {
@@ -87,7 +97,7 @@ export class AuthService {
         id: true,
         email: true,
         currentRefreshTokenHash: true,
-      }
+      },
     });
 
     if (!user || !user.currentRefreshTokenHash) {
@@ -95,7 +105,10 @@ export class AuthService {
     }
 
     // Compare refresh tokens
-    const isRefreshTokenMatching = await bcrypt.compare(refreshToken, user.currentRefreshTokenHash);
+    const isRefreshTokenMatching = await bcrypt.compare(
+      refreshToken,
+      user.currentRefreshTokenHash,
+    );
     if (!isRefreshTokenMatching) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
@@ -121,12 +134,22 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_SECRET') || 'super-secret-access-token-key-change-me-in-production',
-        expiresIn: parseTimeToSeconds(this.configService.get<string>('JWT_ACCESS_EXPIRATION'), 900), // 15m default (900 seconds)
+        secret:
+          this.configService.get<string>('JWT_SECRET') ||
+          'super-secret-access-token-key-change-me-in-production',
+        expiresIn: parseTimeToSeconds(
+          this.configService.get<string>('JWT_ACCESS_EXPIRATION'),
+          900,
+        ), // 15m default (900 seconds)
       }),
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET') || 'super-secret-refresh-token-key-change-me-in-production',
-        expiresIn: parseTimeToSeconds(this.configService.get<string>('JWT_REFRESH_EXPIRATION'), 604800), // 7d default (604800 seconds)
+        secret:
+          this.configService.get<string>('JWT_REFRESH_SECRET') ||
+          'super-secret-refresh-token-key-change-me-in-production',
+        expiresIn: parseTimeToSeconds(
+          this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
+          604800,
+        ), // 7d default (604800 seconds)
       }),
     ]);
 
@@ -148,7 +171,9 @@ export class AuthService {
   async verifyRefreshToken(token: string): Promise<any> {
     try {
       return await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET') || 'super-secret-refresh-token-key-change-me-in-production',
+        secret:
+          this.configService.get<string>('JWT_REFRESH_SECRET') ||
+          'super-secret-refresh-token-key-change-me-in-production',
       });
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');

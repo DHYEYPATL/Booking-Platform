@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -26,7 +26,9 @@ export class BookingsService {
     const { serviceId, bookingDate, bookingTime } = createBookingDto;
 
     // 1. Verify that the service exists and is active
-    const service = await this.serviceRepository.findOne({ where: { id: serviceId } });
+    const service = await this.serviceRepository.findOne({
+      where: { id: serviceId },
+    });
     this.bookingsValidator.validateServiceAvailability(service, serviceId);
 
     // 2. Validate that the booking date and time is not in the past
@@ -46,7 +48,7 @@ export class BookingsService {
       throw new AppException(
         `This service is already booked for ${bookingDate} at ${bookingTime}. Please choose another time slot.`,
         ErrorCode.DUPLICATE_BOOKING,
-        HttpStatus.CONFLICT
+        HttpStatus.CONFLICT,
       );
     }
 
@@ -59,7 +61,10 @@ export class BookingsService {
     const savedBooking = await this.bookingRepository.save(booking);
 
     // 5. Emit BookingCreatedEvent asynchronously for processing notifications/emails
-    this.eventEmitter.emit('booking.created', new BookingCreatedEvent(savedBooking));
+    this.eventEmitter.emit(
+      'booking.created',
+      new BookingCreatedEvent(savedBooking),
+    );
 
     return savedBooking;
   }
@@ -79,7 +84,7 @@ export class BookingsService {
       const searchPattern = `%${search.toLowerCase()}%`;
       query.andWhere(
         '(LOWER(booking.customerName) LIKE :search OR LOWER(booking.customerEmail) LIKE :search OR LOWER(booking.customerPhone) LIKE :search)',
-        { search: searchPattern }
+        { search: searchPattern },
       );
     }
 
@@ -106,13 +111,20 @@ export class BookingsService {
     });
 
     if (!booking) {
-      throw new AppException(`Booking with ID "${id}" not found`, ErrorCode.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND);
+      throw new AppException(
+        `Booking with ID "${id}" not found`,
+        ErrorCode.BOOKING_NOT_FOUND,
+        HttpStatus.NOT_FOUND,
+      );
     }
-    
+
     return booking;
   }
 
-  async updateStatus(id: string, updateBookingStatusDto: UpdateBookingStatusDto): Promise<Booking> {
+  async updateStatus(
+    id: string,
+    updateBookingStatusDto: UpdateBookingStatusDto,
+  ): Promise<Booking> {
     const { status: newStatus } = updateBookingStatusDto;
     const booking = await this.findOne(id);
 

@@ -18,7 +18,6 @@ describe('AuthService', () => {
   let service: AuthService;
   let userRepository: jest.Mocked<Repository<User>>;
   let jwtService: jest.Mocked<JwtService>;
-  let configService: jest.Mocked<ConfigService>;
 
   const mockUserRepository = () => ({
     findOne: jest.fn(),
@@ -58,7 +57,6 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     userRepository = module.get(getRepositoryToken(User));
     jwtService = module.get(JwtService);
-    configService = module.get(ConfigService);
   });
 
   it('should be defined', () => {
@@ -76,8 +74,12 @@ describe('AuthService', () => {
 
     it('should successfully register a new user', async () => {
       userRepository.findOne.mockResolvedValue(null);
-      
-      const mockSavedUser = { id: 'user-uuid', email: dto.email, password: 'hashedPassword' } as User;
+
+      const mockSavedUser = {
+        id: 'user-uuid',
+        email: dto.email,
+        password: 'hashedPassword',
+      } as User;
       userRepository.create.mockReturnValue(mockSavedUser);
       userRepository.save.mockResolvedValue(mockSavedUser);
 
@@ -99,17 +101,25 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException if password mismatch', async () => {
-      userRepository.findOne.mockResolvedValue({ id: 'uuid', email: dto.email, password: 'hashed' } as User);
+      userRepository.findOne.mockResolvedValue({
+        id: 'uuid',
+        email: dto.email,
+        password: 'hashed',
+      } as User);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(service.login(dto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should successfully login and generate tokens', async () => {
-      const mockUser = { id: 'user-uuid', email: dto.email, password: 'hashed' } as User;
+      const mockUser = {
+        id: 'user-uuid',
+        email: dto.email,
+        password: 'hashed',
+      } as User;
       userRepository.findOne.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-      
+
       jwtService.signAsync
         .mockResolvedValueOnce('accessTokenVal')
         .mockResolvedValueOnce('refreshTokenVal');
@@ -126,18 +136,28 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException if user not found or hash missing', async () => {
       userRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.refreshTokens('user-uuid', 'token')).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshTokens('user-uuid', 'token')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException if refresh token hashes do not match', async () => {
-      userRepository.findOne.mockResolvedValue({ id: 'uuid', currentRefreshTokenHash: 'hashedHash' } as User);
+      userRepository.findOne.mockResolvedValue({
+        id: 'uuid',
+        currentRefreshTokenHash: 'hashedHash',
+      } as User);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.refreshTokens('uuid', 'wrong-token')).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.refreshTokens('uuid', 'wrong-token'),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should rotate tokens if matching', async () => {
-      userRepository.findOne.mockResolvedValue({ id: 'uuid', currentRefreshTokenHash: 'hashedHash' } as User);
+      userRepository.findOne.mockResolvedValue({
+        id: 'uuid',
+        currentRefreshTokenHash: 'hashedHash',
+      } as User);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       jwtService.signAsync
@@ -154,7 +174,9 @@ describe('AuthService', () => {
   describe('logout', () => {
     it('should clear refresh token hash', async () => {
       await service.logout('user-uuid');
-      expect(userRepository.update).toHaveBeenCalledWith('user-uuid', { currentRefreshTokenHash: undefined });
+      expect(userRepository.update).toHaveBeenCalledWith('user-uuid', {
+        currentRefreshTokenHash: undefined,
+      });
     });
   });
 });

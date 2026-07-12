@@ -71,7 +71,9 @@ export class InitialSchema1712345678901 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP INDEX IF EXISTS "idx_booking_service_date_time_unique"`);
+    await queryRunner.query(
+      `DROP INDEX IF EXISTS "idx_booking_service_date_time_unique"`,
+    );
     await queryRunner.query(`DROP TABLE "bookings"`);
     await queryRunner.query(`DROP TABLE "services"`);
     await queryRunner.query(`DROP TABLE "users"`);

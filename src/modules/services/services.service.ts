@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { Service } from './entities/service.entity';
@@ -18,7 +22,10 @@ export class ServicesService {
     private readonly cacheService: CacheService,
   ) {}
 
-  async create(createServiceDto: CreateServiceDto, userId?: string): Promise<Service> {
+  async create(
+    createServiceDto: CreateServiceDto,
+    userId?: string,
+  ): Promise<Service> {
     const service = this.serviceRepository.create({
       ...createServiceDto,
       createdBy: userId,
@@ -26,19 +33,22 @@ export class ServicesService {
     });
 
     const saved = await this.serviceRepository.save(service);
-    
+
     // Invalidate public service cache
     this.cacheService.clear();
-    
+
     return saved;
   }
 
   async findAll(paginationDto: PaginationDto) {
     const { limit, offset } = paginationDto;
-    
+
     // Generate unique cache key based on pagination limits
     const cacheKey = `services:limit=${limit}:offset=${offset}`;
-    const cachedData = this.cacheService.get<{ data: Service[]; total: number }>(cacheKey);
+    const cachedData = this.cacheService.get<{
+      data: Service[];
+      total: number;
+    }>(cacheKey);
 
     if (cachedData) {
       return {
@@ -55,7 +65,7 @@ export class ServicesService {
     });
 
     const result = { data, total };
-    
+
     // Cache the list of active services for 5 minutes (300,000 ms)
     this.cacheService.set(cacheKey, result, 300000);
 
@@ -74,19 +84,23 @@ export class ServicesService {
     return service;
   }
 
-  async update(id: string, updateServiceDto: UpdateServiceDto, userId?: string): Promise<Service> {
+  async update(
+    id: string,
+    updateServiceDto: UpdateServiceDto,
+    userId?: string,
+  ): Promise<Service> {
     const service = await this.findOne(id);
-    
+
     const updated = this.serviceRepository.merge(service, {
       ...updateServiceDto,
       updatedBy: userId,
     });
 
     const saved = await this.serviceRepository.save(updated);
-    
+
     // Invalidate public service cache
     this.cacheService.clear();
-    
+
     return saved;
   }
 
@@ -103,7 +117,7 @@ export class ServicesService {
 
     if (activeBooking) {
       throw new BadRequestException(
-        'Cannot delete this service because it has active bookings associated with it. You can set isActive to false to disable it instead.'
+        'Cannot delete this service because it has active bookings associated with it. You can set isActive to false to disable it instead.',
       );
     }
 
@@ -112,10 +126,10 @@ export class ServicesService {
       service.updatedBy = userId;
       await this.serviceRepository.save(service);
     }
-    
+
     // Execute soft delete
     await this.serviceRepository.softRemove(service);
-    
+
     // Invalidate public service cache
     this.cacheService.clear();
   }

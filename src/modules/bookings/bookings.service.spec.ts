@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ConflictException } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { Booking, BookingStatus } from './entities/booking.entity';
 import { Service } from '../services/entities/service.entity';
@@ -82,7 +81,11 @@ describe('BookingsService', () => {
     });
 
     it('should throw AppException (INACTIVE_SERVICE) if service is inactive', async () => {
-      const mockService = { id: mockServiceId, isActive: false, title: 'Test Service' } as Service;
+      const mockService = {
+        id: mockServiceId,
+        isActive: false,
+        title: 'Test Service',
+      } as Service;
       serviceRepository.findOne.mockResolvedValue(mockService);
 
       try {
@@ -95,7 +98,11 @@ describe('BookingsService', () => {
     });
 
     it('should throw AppException (PAST_DATE) if booking date is in the past', async () => {
-      const mockService = { id: mockServiceId, isActive: true, title: 'Test Service' } as Service;
+      const mockService = {
+        id: mockServiceId,
+        isActive: true,
+        title: 'Test Service',
+      } as Service;
       serviceRepository.findOne.mockResolvedValue(mockService);
 
       const pastDto = { ...mockDto, bookingDate: '2020-01-01' };
@@ -110,9 +117,15 @@ describe('BookingsService', () => {
     });
 
     it('should throw AppException (DUPLICATE_BOOKING) if duplicate booking exists', async () => {
-      const mockService = { id: mockServiceId, isActive: true, title: 'Test Service' } as Service;
+      const mockService = {
+        id: mockServiceId,
+        isActive: true,
+        title: 'Test Service',
+      } as Service;
       serviceRepository.findOne.mockResolvedValue(mockService);
-      bookingRepository.findOne.mockResolvedValue({ id: 'existing-booking-id' } as Booking);
+      bookingRepository.findOne.mockResolvedValue({
+        id: 'existing-booking-id',
+      } as Booking);
 
       try {
         await service.create(mockDto);
@@ -124,28 +137,44 @@ describe('BookingsService', () => {
     });
 
     it('should successfully create a booking', async () => {
-      const mockService = { id: mockServiceId, isActive: true, title: 'Test Service' } as Service;
+      const mockService = {
+        id: mockServiceId,
+        isActive: true,
+        title: 'Test Service',
+      } as Service;
       serviceRepository.findOne.mockResolvedValue(mockService);
       bookingRepository.findOne.mockResolvedValue(null);
 
-      const mockCreatedBooking = { ...mockDto, id: 'booking-uuid', status: BookingStatus.PENDING } as Booking;
+      const mockCreatedBooking = {
+        ...mockDto,
+        id: 'booking-uuid',
+        status: BookingStatus.PENDING,
+      } as Booking;
       bookingRepository.create.mockReturnValue(mockCreatedBooking);
       bookingRepository.save.mockResolvedValue(mockCreatedBooking);
 
       const result = await service.create(mockDto);
       expect(result).toEqual(mockCreatedBooking);
       expect(bookingRepository.save).toHaveBeenCalled();
-      expect(eventEmitter.emit).toHaveBeenCalledWith('booking.created', expect.any(Object));
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'booking.created',
+        expect.any(Object),
+      );
     });
   });
 
   describe('updateStatus', () => {
     it('should throw AppException (INVALID_STATUS_TRANSITION) when trying to change CANCELLED booking to COMPLETED', async () => {
-      const mockBooking = { id: 'booking-uuid', status: BookingStatus.CANCELLED } as Booking;
+      const mockBooking = {
+        id: 'booking-uuid',
+        status: BookingStatus.CANCELLED,
+      } as Booking;
       bookingRepository.findOne.mockResolvedValue(mockBooking);
 
       try {
-        await service.updateStatus('booking-uuid', { status: BookingStatus.COMPLETED });
+        await service.updateStatus('booking-uuid', {
+          status: BookingStatus.COMPLETED,
+        });
         fail('Expected AppException to be thrown');
       } catch (error: any) {
         expect(error).toBeInstanceOf(AppException);
@@ -154,11 +183,16 @@ describe('BookingsService', () => {
     });
 
     it('should throw AppException (INVALID_STATUS_TRANSITION) when trying to modify COMPLETED booking', async () => {
-      const mockBooking = { id: 'booking-uuid', status: BookingStatus.COMPLETED } as Booking;
+      const mockBooking = {
+        id: 'booking-uuid',
+        status: BookingStatus.COMPLETED,
+      } as Booking;
       bookingRepository.findOne.mockResolvedValue(mockBooking);
 
       try {
-        await service.updateStatus('booking-uuid', { status: BookingStatus.CONFIRMED });
+        await service.updateStatus('booking-uuid', {
+          status: BookingStatus.CONFIRMED,
+        });
         fail('Expected AppException to be thrown');
       } catch (error: any) {
         expect(error).toBeInstanceOf(AppException);
@@ -167,18 +201,26 @@ describe('BookingsService', () => {
     });
 
     it('should successfully update status', async () => {
-      const mockBooking = { id: 'booking-uuid', status: BookingStatus.PENDING } as Booking;
+      const mockBooking = {
+        id: 'booking-uuid',
+        status: BookingStatus.PENDING,
+      } as Booking;
       bookingRepository.findOne.mockResolvedValue(mockBooking);
       bookingRepository.save.mockImplementation(async (b: any) => b);
 
-      const result = await service.updateStatus('booking-uuid', { status: BookingStatus.CONFIRMED });
+      const result = await service.updateStatus('booking-uuid', {
+        status: BookingStatus.CONFIRMED,
+      });
       expect(result.status).toBe(BookingStatus.CONFIRMED);
     });
   });
 
   describe('cancel', () => {
     it('should throw AppException (INVALID_STATUS_TRANSITION) when trying to cancel COMPLETED booking', async () => {
-      const mockBooking = { id: 'booking-uuid', status: BookingStatus.COMPLETED } as Booking;
+      const mockBooking = {
+        id: 'booking-uuid',
+        status: BookingStatus.COMPLETED,
+      } as Booking;
       bookingRepository.findOne.mockResolvedValue(mockBooking);
 
       try {
@@ -191,7 +233,10 @@ describe('BookingsService', () => {
     });
 
     it('should return same booking if already CANCELLED', async () => {
-      const mockBooking = { id: 'booking-uuid', status: BookingStatus.CANCELLED } as Booking;
+      const mockBooking = {
+        id: 'booking-uuid',
+        status: BookingStatus.CANCELLED,
+      } as Booking;
       bookingRepository.findOne.mockResolvedValue(mockBooking);
 
       const result = await service.cancel('booking-uuid');
@@ -200,7 +245,10 @@ describe('BookingsService', () => {
     });
 
     it('should cancel booking and save', async () => {
-      const mockBooking = { id: 'booking-uuid', status: BookingStatus.PENDING } as Booking;
+      const mockBooking = {
+        id: 'booking-uuid',
+        status: BookingStatus.PENDING,
+      } as Booking;
       bookingRepository.findOne.mockResolvedValue(mockBooking);
       bookingRepository.save.mockImplementation(async (b: any) => b);
 

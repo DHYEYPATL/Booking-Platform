@@ -6,7 +6,8 @@ import { Booking } from '../modules/bookings/entities/booking.entity';
 
 dotenv.config();
 
-const dbType = (process.env.DB_TYPE || 'postgres') as 'postgres' | 'better-sqlite3';
+const dbType = (process.env.DB_TYPE || 'postgres') as
+  'postgres' | 'better-sqlite3';
 
 export const AppDataSource = new DataSource(
   dbType === 'better-sqlite3'
@@ -29,5 +30,5 @@ export const AppDataSource = new DataSource(
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
         synchronize: false,
         logging: true,
-      }
+      },
 );

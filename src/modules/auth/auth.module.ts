@@ -17,9 +17,14 @@ import { parseTimeToSeconds } from '@common/utils/time';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'super-secret-access-token-key-change-me-in-production',
+        secret:
+          configService.get<string>('JWT_SECRET') ||
+          'super-secret-access-token-key-change-me-in-production',
         signOptions: {
-          expiresIn: parseTimeToSeconds(configService.get<string>('JWT_ACCESS_EXPIRATION'), 900), // 15m default
+          expiresIn: parseTimeToSeconds(
+            configService.get<string>('JWT_ACCESS_EXPIRATION'),
+            900,
+          ), // 15m default
         },
       }),
     }),

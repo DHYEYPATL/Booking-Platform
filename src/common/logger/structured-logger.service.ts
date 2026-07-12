@@ -23,7 +23,12 @@ export class StructuredLogger extends ConsoleLogger {
     this.printFormatted('verbose', message, context);
   }
 
-  private printFormatted(level: string, message: any, context?: string, stack?: string) {
+  private printFormatted(
+    level: string,
+    message: any,
+    context?: string,
+    stack?: string,
+  ) {
     const store = als.getStore();
     const requestId = store?.requestId;
 
@@ -39,10 +44,9 @@ export class StructuredLogger extends ConsoleLogger {
       console.log(JSON.stringify(logObject));
     } else {
       // Fallback to pretty ConsoleLogger in development
-      const formattedContext = context ? `[${context}]` : '';
       const formattedRequestId = requestId ? ` [ReqID: ${requestId}]` : '';
       const decoratedMessage = `${formattedRequestId} ${message}`;
-      
+
       if (level === 'error') {
         super.error(decoratedMessage, stack, context);
       } else if (level === 'warn') {

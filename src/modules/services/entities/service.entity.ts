@@ -1,21 +1,40 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Service {
-  @ApiProperty({ description: 'Unique identifier of the service', example: 'd3b07384-d113-49c5-a559-6d6f46e0401d' })
+  @ApiProperty({
+    description: 'Unique identifier of the service',
+    example: 'd3b07384-d113-49c5-a559-6d6f46e0401d',
+  })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ description: 'Title of the service', example: 'Gentlemens Haircut' })
+  @ApiProperty({
+    description: 'Title of the service',
+    example: 'Gentlemens Haircut',
+  })
   @Column()
   title: string;
 
-  @ApiProperty({ description: 'Detailed description of the service', example: 'Precision cut, wash, and style' })
+  @ApiProperty({
+    description: 'Detailed description of the service',
+    example: 'Precision cut, wash, and style',
+  })
   @Column('text')
   description: string;
 
-  @ApiProperty({ description: 'Duration of the service in minutes', example: 45 })
+  @ApiProperty({
+    description: 'Duration of the service in minutes',
+    example: 45,
+  })
   @Column()
   duration: number;
 
@@ -23,7 +42,10 @@ export class Service {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
-  @ApiProperty({ description: 'Indicates if the service is currently available for bookings', default: true })
+  @ApiProperty({
+    description: 'Indicates if the service is currently available for bookings',
+    default: true,
+  })
   @Column({ default: true })
   isActive: boolean;
 
@@ -39,11 +61,17 @@ export class Service {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ApiProperty({ description: 'User identifier who created this service', required: false })
+  @ApiProperty({
+    description: 'User identifier who created this service',
+    required: false,
+  })
   @Column({ nullable: true })
   createdBy: string;
 
-  @ApiProperty({ description: 'User identifier who last updated this service', required: false })
+  @ApiProperty({
+    description: 'User identifier who last updated this service',
+    required: false,
+  })
   @Column({ nullable: true })
   updatedBy: string;
 }

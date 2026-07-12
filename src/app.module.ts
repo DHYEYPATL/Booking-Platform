@@ -25,12 +25,14 @@ import { CustomThrottlerGuard } from '@common/guards/custom-throttler.guard';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const dbType = (configService.get<string>('DB_TYPE') || 'postgres') as 'postgres' | 'better-sqlite3';
+        const dbType = (configService.get<string>('DB_TYPE') || 'postgres') as
+          'postgres' | 'better-sqlite3';
 
         return dbType === 'better-sqlite3'
           ? {
               type: 'better-sqlite3',
-              database: configService.get<string>('DB_DATABASE') || 'database.sqlite',
+              database:
+                configService.get<string>('DB_DATABASE') || 'database.sqlite',
               entities: [User, Service, Booking],
               synchronize: true, // Auto-schema update for SQLite local development/testing
               logging: false,
@@ -38,10 +40,14 @@ import { CustomThrottlerGuard } from '@common/guards/custom-throttler.guard';
           : {
               type: 'postgres',
               host: configService.get<string>('DB_HOST') || 'localhost',
-              port: parseInt(configService.get<string>('DB_PORT') || '5432', 10),
+              port: parseInt(
+                configService.get<string>('DB_PORT') || '5432',
+                10,
+              ),
               username: configService.get<string>('DB_USERNAME') || 'postgres',
               password: configService.get<string>('DB_PASSWORD') || 'postgres',
-              database: configService.get<string>('DB_DATABASE') || 'booking_platform',
+              database:
+                configService.get<string>('DB_DATABASE') || 'booking_platform',
               entities: [User, Service, Booking],
               synchronize: false, // Prod/Postgres always requires migrations
               migrationsRun: true, // Runs migrations automatically on app start in PostgreSQL mode
@@ -52,7 +58,7 @@ import { CustomThrottlerGuard } from '@common/guards/custom-throttler.guard';
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute window
-        limit: 30,  // Base limit of 30, overridden dynamically by CustomThrottlerGuard
+        limit: 30, // Base limit of 30, overridden dynamically by CustomThrottlerGuard
       },
     ]),
     EventEmitterModule.forRoot(), // Enable NestJS Event Emitter module globally

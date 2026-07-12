@@ -1,5 +1,18 @@
-import { Controller, Post, Body, UseGuards, Req, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -23,7 +36,10 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login and get tokens' })
-  @ApiResponse({ status: 200, description: 'Successfully authenticated. Returns tokens.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully authenticated. Returns tokens.',
+  })
   @ApiResponse({ status: 401, description: 'Invalid email or password.' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
@@ -33,11 +49,16 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token using refresh token' })
   @ApiResponse({ status: 200, description: 'Tokens successfully refreshed.' })
-  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token.' })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid or expired refresh token.',
+  })
   async refresh(@Body() refreshDto: RefreshDto) {
     // 1. Verify the refresh token first
-    const payload = await this.authService.verifyRefreshToken(refreshDto.refreshToken);
-    
+    const payload = await this.authService.verifyRefreshToken(
+      refreshDto.refreshToken,
+    );
+
     // 2. Perform rotation and return new tokens
     return this.authService.refreshTokens(payload.sub, refreshDto.refreshToken);
   }

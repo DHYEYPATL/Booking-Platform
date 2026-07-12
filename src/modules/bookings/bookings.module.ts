@@ -8,10 +8,7 @@ import { BookingNotificationsListener } from './listeners/booking-notifications.
 import { ServicesModule } from '@modules/services/services.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Booking]),
-    ServicesModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Booking]), ServicesModule],
   controllers: [BookingsController],
   providers: [BookingsService, BookingsValidator, BookingNotificationsListener],
   exports: [BookingsService, BookingsValidator],

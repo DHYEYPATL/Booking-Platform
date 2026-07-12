@@ -8,7 +8,7 @@ export class RequestIdMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     // Generate UUID if not present in request headers
     const requestId = (req.headers['x-request-id'] as string) || randomUUID();
-    
+
     // Set headers on response
     res.setHeader('x-request-id', requestId);
 
