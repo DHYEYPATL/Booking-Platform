@@ -3,6 +3,14 @@
 
 ---
 
+### Deployed Live Project Links
+- **GitHub Project Repository**: https://github.com/DHYEYPATL/Booking-Platform
+- **GitHub Developer Profile**: https://github.com/DHYEYPATL
+- **Interactive API Documentation (Swagger UI)**: https://booking-api-1bjb.onrender.com/api/docs
+- **API Production Health Monitoring Endpoint**: https://booking-api-1bjb.onrender.com/api/v1/health
+
+---
+
 ## 1. Introduction
 
 ### 1.1 Purpose

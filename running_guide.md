@@ -3,6 +3,14 @@
 
 ---
 
+### Deployed Live Project Links
+- **GitHub Project Repository**: https://github.com/DHYEYPATL/Booking-Platform
+- **GitHub Developer Profile**: https://github.com/DHYEYPATL
+- **Interactive API Documentation (Swagger UI)**: https://booking-api-1bjb.onrender.com/api/docs
+- **API Production Health Monitoring Endpoint**: https://booking-api-1bjb.onrender.com/api/v1/health
+
+---
+
 ## 1. Prerequisites
 Ensure you have the following software installed on your host system:
 - **Node.js**: v18.x or v20.x
