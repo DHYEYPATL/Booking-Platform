@@ -1,3 +1,12 @@
+// Node 18 Web Crypto global polyfill for TypeORM in testing environments
+if (typeof globalThis.crypto === 'undefined') {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const crypto = require('crypto');
+  if (crypto && crypto.webcrypto) {
+    globalThis.crypto = crypto.webcrypto;
+  }
+}
+
 // Set environment variables for E2E test database isolation
 process.env.DB_TYPE = 'better-sqlite3';
 process.env.DB_DATABASE = 'test-app.sqlite';
@@ -43,12 +52,12 @@ describe('AppController (e2e)', () => {
   it('should rate-limit requests and return 429 after 60 hits in a minute', async () => {
     // Send 65 concurrent requests to trigger rate limit (configured for max 60/min)
     const requests = Array.from({ length: 65 }).map(() =>
-      request(app.getHttpServer()).get('/api/v1/health'),
+      request(app.getHttpServer()).get('/api/v1/health')
     );
-
+    
     const responses = await Promise.all(requests);
     const hasRateLimited = responses.some((res) => res.status === 429);
-
+    
     expect(hasRateLimited).toBe(true);
   }, 10000); // Set timeout of 10s for concurrent test calls
 

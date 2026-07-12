@@ -1,3 +1,12 @@
+// Node 18 Web Crypto global polyfill for TypeORM in testing environments
+if (typeof globalThis.crypto === 'undefined') {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const crypto = require('crypto');
+  if (crypto && crypto.webcrypto) {
+    globalThis.crypto = crypto.webcrypto;
+  }
+}
+
 // Set environment variables for E2E test database isolation
 process.env.DB_TYPE = 'better-sqlite3';
 process.env.DB_DATABASE = 'test-booking-flow.sqlite';
@@ -33,7 +42,7 @@ describe('Booking Platform Flow (e2e)', () => {
 
   afterAll(async () => {
     await app.close();
-
+    
     // Clean up test database file
     const dbPath = path.join(process.cwd(), 'test-booking-flow.sqlite');
     try {
