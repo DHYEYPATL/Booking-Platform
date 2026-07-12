@@ -13,6 +13,7 @@ RUN chown -R node:node /usr/src/app
 COPY --chown=node:node package*.json ./
 
 # Install development & build dependencies
+RUN apk add --no-cache python3 make g++
 RUN npm ci
 
 # Copy source bundle
